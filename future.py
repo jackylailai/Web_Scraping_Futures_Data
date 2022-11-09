@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime,timedelta
+from pprint import pprint
 
 def crawl(date):
 
@@ -16,7 +17,8 @@ def crawl(date):
     except AttributeError:
         print("no data for" ,date)
         return
-    rows = trs[3:]#把第三個之後的tr放進去
+    rows = trs[3:-4]#把第三個之後的tr放進去
+    final = {} #不進回圈不然會被洗掉
     for row in rows:
         tds = row.find_all("td")
         ths = row.find_all("th")#需要找th的第二個 [1]
@@ -29,14 +31,32 @@ def crawl(date):
             product = th[2]
 
             data = [product] + cells[0:]
-            final = [title] + data #list相加         data不用[]為什麼啊？
-            print(len(final))
+            row_final = [title] + data #list相加         data不用[]為什麼啊？
+            
         else:
             
             product = th[0]
             data = [product] + cells
-            final = [title] + data #他會自己去外面找title？
-            print(len(final))
+            row_final = [title] + data #他會自己去外面找title？
+        # print(final)
+        converted = [int(f.replace(",","")) for f in row_final[2:]] #出來是數字的字串
+
+        row_final = row_final[:2] + converted
+        # print(final)
+
+        headers =["商品名稱", "身份別" , "交易多方口數" ,"交易多方金額","交易空方口數","交易空方金額", "多空淨額口數","多空淨額金額","未平倉多方口數","未平倉多方金額","未平倉空方口數","未平倉空方金額","未平倉多空淨額口數","未平倉多空淨額金額"]
+        #print(len(headers))
+        
+        #product -> who -> what(headers的內容)
+        product = row_final[0]#美國道瓊那些
+        who = row_final[1]#投信自營商
+        contents = {headers[i]: row_final[i] for i in range(2,len(headers))} #len要加一？ 先處理後面數字以及名稱對應，之後再來處理開頭的（誰：外資）還有什麼交易：美國道瓊
+        if product not in final:
+            final[product] = {who:contents}#final裡頭這個字典 就會創一個key:product value:
+        else:
+            final[product][who] = contents
+        pprint(final)
+
 date = datetime.today()
 while True:
     crawl(date)
