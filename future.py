@@ -10,7 +10,7 @@ def crawl(date):
         soup = BeautifulSoup(r.text, "html.parser")
         print("順利拿到data日期", date)
     else:
-        print("connection error")   
+        print("connection error")    
     try: 
         table = soup.find("table", class_="table_f") #要來找table 條件在後面
         trs = table.find_all("tr")#再下去找tr
@@ -47,14 +47,15 @@ def crawl(date):
         headers =["商品名稱", "身份別" , "交易多方口數" ,"交易多方金額","交易空方口數","交易空方金額", "多空淨額口數","多空淨額金額","未平倉多方口數","未平倉多方金額","未平倉空方口數","未平倉空方金額","未平倉多空淨額口數","未平倉多空淨額金額"]
         #print(len(headers))
         
-        #product -> who -> what(headers的內容)
+        #product（美國道瓊） -> who -> what(headers的內容)
         product = row_final[0]#美國道瓊那些
         who = row_final[1]#投信自營商
         contents = {headers[i]: row_final[i] for i in range(2,len(headers))} #len要加一？ 先處理後面數字以及名稱對應，之後再來處理開頭的（誰：外資）還有什麼交易：美國道瓊
+        #三層字典 上面這個是最深層的字典 
         if product not in final:
-            final[product] = {who:contents}#final裡頭這個字典 就會創一個key:product value:
+            final[product] = {who:contents}#final裡頭這個字典 就會創一個key:product value:一個字典 這個字典由key:who value:contents產生
         else:
-            final[product][who] = contents
+            final[product][who] = contents#final字典裡面key:product 對應的value再輸入key為who 就會產生value:contents
         pprint(final)
 
 date = datetime.today()
