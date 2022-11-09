@@ -16,25 +16,31 @@ def crawl(date):
     except AttributeError:
         print("no data for" ,date)
         return
-    rows = trs[3:]
+    rows = trs[3:]#把第三個之後的tr放進去
     for row in rows:
         tds = row.find_all("td")
         ths = row.find_all("th")#需要找th的第二個 [1]
 
         cells = [td.text.strip() for td in tds]#strip裡面如果有空格要清掉
         th = [th.text.strip() for th in ths]
-        if len(cells) == 15:
-            product = th[1]
-            data = cells[1:]
+        
+        if len(th) == 3:
+            title=th[1]
+            product = th[2]
+
+            data = [product] + cells[0:]
+            final = [title] + data #list相加         data不用[]為什麼啊？
+            print(len(final))
         else:
+            
             product = th[0]
             data = [product] + cells
-
-        print(data)
+            final = [title] + data #他會自己去外面找title？
+            print(len(final))
 date = datetime.today()
 while True:
     crawl(date)
     date = date - timedelta(days=1)#進來回圈之後date會一直減少
-    if date < datetime.today() - timedelta(days=5):#如果date減到小於 現在moment-5天的那個date 就停
+    if date < datetime.today() - timedelta(days=2):#如果date減到小於 現在moment-5天的那個date 就停
         break
     
