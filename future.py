@@ -41,7 +41,7 @@ def crawl(date):
         # print(final)
         converted = [int(f.replace(",","")) for f in row_final[2:]] #出來是數字的字串
 
-        row_final = row_final[:2] + converted
+        row_final = row_final[:2] + converted#商品 身份 +後續一串數字(12個)
         # print(final)
 
         headers =["商品名稱", "身份別" , "交易多方口數" ,"交易多方金額","交易空方口數","交易空方金額", "多空淨額口數","多空淨額金額","未平倉多方口數","未平倉多方金額","未平倉空方口數","未平倉空方金額","未平倉多空淨額口數","未平倉多空淨額金額"]
@@ -51,7 +51,8 @@ def crawl(date):
         product = row_final[0]#美國道瓊那些
         who = row_final[1]#投信自營商
         contents = {headers[i]: row_final[i] for i in range(2,len(headers))} #len要加一？ 先處理後面數字以及名稱對應，之後再來處理開頭的（誰：外資）還有什麼交易：美國道瓊
-        #三層字典 上面這個是最深層的字典 
+        #三層字典 上面這個是最深層的字典 #range 2~14 相當於第三個到第13個
+        # print(contents)
         if product not in final:
             final[product] = {who:contents}#final裡頭這個字典 就會創一個key:product value:一個字典 這個字典由key:who value:contents產生
         else:
